@@ -18,7 +18,6 @@ races_2020 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
 
 drivers_2021 = ['33', '44', '77', '16', '10', '3', '4', '55', '14', '18', '11', '99', '22', '7', '63', '31', '6', '5', '47', '9']
 races_2021 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
-#races_2021 = [1,2,3,4,5]
 
 
 drivers = {}
@@ -27,23 +26,17 @@ for driver in drivers_2018:
 
 
 def get_scores_for_race(race):
-
-    print("ATTEMPTING RACE", race)
     session = fastf1.get_session(2018, race, 'Q')
     session.load()
     
     
     for driver in drivers:
-#        print("in loop")
         drivers[driver][race] = {}
         lap = session.laps.pick_driver(driver).pick_fastest()
         try:
             tel = lap.get_car_data().add_distance()
         except AttributeError:
-            #lap = None
-            #tel = None
             drivers[driver][race] = 0
-#            print("breaking")
             continue
 
         drivers[driver][race]['lap'] = lap
@@ -51,7 +44,6 @@ def get_scores_for_race(race):
     
     for driver in drivers:
         if drivers[driver][race] == 0:
-#            print("breaking 2")
             continue
 
         tel = drivers[driver][race]['tel']
@@ -68,11 +60,8 @@ def get_scores_for_race(race):
             if acc > fastest_acc:
                 fastest_acc = acc
 
-            k0 = 0.5 * 740 * (tel['Speed'][i] / 3.6)**2
-            k1 = 0.5 * 740 * (tel['Speed'][i+2] / 3.6)**2
             tm = tel['Time'][i+2] - tel['Time'][i]
             t = tm.microseconds / 1000000
-            p = (k1 - k0)/t
             s0 = tel['Speed'][i] / 3.6
             s1 = tel['Speed'][i+2] / 3.6
             a = (s1-s0)/t
@@ -87,26 +76,16 @@ def get_scores_for_race(race):
             drivers[driver][race]['p'].append(p)
 
     
-#        print("Fastest acc =", fastest_acc)
         drivers[driver][race]['acc'].sort(reverse=True)
         drivers[driver][race]['p'].sort(reverse=True)
-#        print(driver, ":", drivers[driver]['acc'][1:7])
         drivers[driver][race]['avg_acc'] = sum(drivers[driver][race]['acc'][1:7]) / 6
         drivers[driver][race]['avg_p'] = sum(drivers[driver][race]['p'][0:3]) / 3
 
-        
-    
 
     fastest_avg_acc = 0
     high_avg_p = 0
-#    print(drivers)
     for driver in drivers:
-#        print(driver)
-#        print("\n\n\n\nPrinting driver") 
-#        print("driver:", driver)
-#        print(drivers[driver])
         if drivers[driver][race] == 0:
-#            print("breaking 3")
             continue
 
         avg_acc = drivers[driver][race]['avg_acc']
@@ -117,23 +96,13 @@ def get_scores_for_race(race):
             high_avg_p = avg_p
     
 
-#    print(f"\nRace {race}")
-    #print(drivers)
     for driver in drivers:
-#        print(driver)
-#        print("\n\n\n\nPrinting driver") 
-#        print(drivers[driver])
-#        print(drivers[driver][race])
         if drivers[driver][race] == 0:
-#            print("in 4")
             drivers[driver][race] = {'avg_acc': 0, 'avg_p': 0}
 
         acc_score = drivers[driver][race]['avg_acc'] / fastest_avg_acc
         drivers[driver][race]['acc_score'] = acc_score 
-#        print(driver, acc_score)
    
-
-
 
 for race in races_2018:
     get_scores_for_race(race)
